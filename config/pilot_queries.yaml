@@ -1,0 +1,63 @@
+# Pilot sample definition, version 0.1 (see docs/03-pilot-plan.md)
+# Everything that decides which papers enter the pilot lives in this file.
+version: "0.1"
+seed: 20261122          # random seed for all draws; never change it after the pilot is frozen
+pool_size: 200          # top-N OpenAlex search results per query form the candidate pool
+year_min: 1970
+
+anchors:  # Block A. Details from memory; the script verifies each against OpenAlex.
+  - {id: A01, title: "Facing up to the problem of consciousness", author: "Chalmers", year: 1995}
+  - {id: A02, title: "On a confusion about a function of consciousness", author: "Block", year: 1995}
+  - {id: A03, title: "Experimental and theoretical approaches to conscious processing", author: "Dehaene", year: 2011}
+  - {id: A04, title: "An information integration theory of consciousness", author: "Tononi", year: 2004}
+  - {id: A05, title: "Towards a true neural stance on consciousness", author: "Lamme", year: 2006}
+  - {id: A06, title: "Empirical support for higher-order theories of conscious awareness", author: "Lau", year: 2011}
+  - {id: A07, title: "The attention schema theory: a mechanistic account of subjective awareness", author: "Graziano", year: 2015}
+  - {id: A08, title: "A sensorimotor account of vision and visual consciousness", author: "O'Regan", year: 2001}
+  - {id: A09, title: "Theories of consciousness", author: "Seth", year: 2022}
+  - {id: A10, title: "Neural correlates of consciousness: progress and problems", author: "Koch", year: 2016}
+  - {id: A11, title: "Adversarial testing of global neuronal workspace and integrated information theories of consciousness", author: "", year: 2025}
+  - {id: A12, title: "No-report paradigms: extracting the true neural correlates of consciousness", author: "Tsuchiya", year: 2015}
+  - {id: A13, title: "Detecting awareness in the vegetative state", author: "Owen", year: 2006}
+  - {id: A14, title: "A theoretically based index of consciousness independent of sensory processing and behavior", author: "Casali", year: 2013}
+  - {id: A15, title: "The neural correlates of dreaming", author: "Siclari", year: 2017}
+  - {id: A16, title: "Rubber hands 'feel' touch that eyes see", author: "Botvinick", year: 1998}
+  - {id: A17, title: "How to measure metacognition", author: "Fleming", year: 2014}
+  - {id: A18, title: "Neural correlates of the LSD experience revealed by multimodal neuroimaging", author: "Carhart-Harris", year: 2016}
+  - {id: A19, title: "Consciousness in Artificial Intelligence: Insights from the Science of Consciousness", author: "Butlin", year: 2023}
+  - {id: A20, title: "Illusionism as a theory of consciousness", author: "Frankish", year: 2016}
+
+domain_draws:  # Block B. 5 papers per domain, drawn from papers that have an abstract.
+  per_query: 5
+  queries:
+    - {id: D1, label: "Phenomenal consciousness", search: '"phenomenal consciousness" OR qualia OR "hard problem of consciousness"'}
+    - {id: D2, label: "Access consciousness", search: '"access consciousness" OR (overflow AND "phenomenal consciousness") OR (reportability AND consciousness)'}
+    - {id: D3, label: "Neural correlates", search: '"neural correlates of consciousness" OR ("conscious perception" AND (EEG OR fMRI OR MEG))'}
+    - {id: D4, label: "States and levels", search: '"disorders of consciousness" OR "minimally conscious state" OR (anesthesia AND "level of consciousness") OR (sleep AND "conscious experience")'}
+    - {id: D5, label: "Contents", search: '(("visual masking" OR "binocular rivalry" OR "inattentional blindness" OR blindsight) AND (awareness OR conscious))'}
+    - {id: D6, label: "Self and metacognition", search: '"body ownership" OR "bodily self-consciousness" OR (metacognition AND awareness AND perception)'}
+    - {id: D7, label: "Theories", search: '("theory of consciousness" OR "global workspace" OR "integrated information theory" OR "higher-order theory" OR "recurrent processing theory" OR "predictive processing") AND consciousness'}
+    - {id: D8, label: "Artificial consciousness", search: '"artificial consciousness" OR "machine consciousness" OR (consciousness AND "large language models")'}
+    - {id: D9, label: "Altered states", search: '(psychedelic OR psilocybin OR meditation OR hypnosis) AND ("altered states of consciousness" OR "conscious experience")'}
+    - {id: D10, label: "Animal consciousness", search: '"animal consciousness" OR (sentience AND (fish OR insects OR invertebrates OR cephalopods))'}
+
+trap_draws:  # Block C. Built to hit the rubric's false-positive traps. Expected mostly incidental or unrelated.
+  per_query: 5
+  queries:
+    - {id: T1, label: "Situational awareness", search: '"situational awareness" OR "situation awareness"'}
+    - {id: T2, label: "Attitude senses of consciousness/awareness", search: '"environmental consciousness" OR "brand awareness" OR "health consciousness" OR "class consciousness"'}
+    - {id: T3, label: "AI attention mechanisms", search: '"attention mechanism" AND transformer'}
+    - {id: T4, label: "Emotional arousal", search: '"emotional arousal" AND ratings'}
+    - {id: T5, label: "Loss of consciousness as a clinical endpoint", search: '"loss of consciousness" AND (sedation OR propofol) AND (dose OR hemodynamic)'}
+    - {id: T6, label: "Priming (edge cases)", search: '"subliminal priming" OR "masked priming"'}
+
+no_abstract_draws:  # Block D. Records without an abstract; kept with status no_abstract, never coded.
+  count: 10
+  search: 'consciousness'
+
+balance_minimums:  # docs/03-pilot-plan.md; checked with OpenAlex metadata as rough proxies
+  philosophy: 15
+  review: 10
+  ai_computational: 8
+  clinical: 10
+  decades: 4
