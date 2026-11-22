@@ -43,3 +43,9 @@ def test_slim_record_keeps_open_abstract():
 
 def test_short_abstract_not_usable():
     assert usable_abstract("too short") is False
+
+
+def test_strip_markup_jats():
+    from crip.fallback_abstracts import strip_markup, _bare_doi
+    assert strip_markup("<jats:p>Abstract <jats:italic>Rubber</jats:italic> hands &amp; eyes</jats:p>") == "Rubber hands & eyes"
+    assert _bare_doi("https://doi.org/10.1038/35784") == "10.1038/35784"

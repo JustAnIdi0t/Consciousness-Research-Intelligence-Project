@@ -28,6 +28,7 @@ import yaml
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from crip.openalex import OpenAlex, slim_record, title_similarity, reconstruct_abstract  # noqa: E402
+from crip import fallback_abstracts  # noqa: E402
 
 CONFIG = ROOT / "config" / "pilot_queries.yaml"
 OUT = ROOT / "data" / "pilot"
@@ -78,6 +79,13 @@ def verify_anchor(oa: OpenAlex, a: dict) -> tuple[dict, dict | None]:
     return row, (best if status != "not_found" else None)
 
 
+def _count(items) -> dict:
+    out: dict = {}
+    for i in items:
+        out[i] = out.get(i, 0) + 1
+    return out
+
+
 def classify_balance(rec: dict) -> set[str]:
     tags = set()
     field, sub = (rec.get("field") or ""), (rec.get("subfield") or "")
@@ -114,6 +122,18 @@ def main() -> None:
             seen.add(work["id"])
             selected.append({"pilot_id": a["id"], "block": "A_anchor", "query_id": a["id"], "work": work})
         print(f"{a['id']} {row['status']:9} {row['match_score']:.2f}  {row['found_title'][:70]}")
+
+    # Anchors without an OpenAlex abstract: try PubMed, then Crossref, by DOI
+    for s_ in selected:
+        if s_["block"] == "A_anchor" and abstract_words(s_["work"]) < MIN_ABSTRACT_WORDS:
+            text, src = fallback_abstracts.find_abstract(s_["work"].get("doi"))
+            s_["fallback"] = (text, src)
+            print(f"  {s_['pilot_id']} abstract from fallback: {src or 'none found'}")
+        for row in anchor_rows:
+            if row["anchor_id"] == s_["pilot_id"] and s_.get("fallback"):
+                row["fallback_abstract_source"] = s_["fallback"][1] or "none"
+    for row in anchor_rows:
+        row.setdefault("fallback_abstract_source", "")
 
     base_filters = {"language": "en", "has_abstract": "true", "publication_year": f">{cfg['year_min'] - 1}"}
 
@@ -156,7 +176,7 @@ def main() -> None:
 
     records = []
     for s in selected:
-        rec = slim_record(s["work"])
+        rec = slim_record(s["work"], *(s.get("fallback") or (None, None)))
         rec.update({"pilot_id": s["pilot_id"], "block": s["block"], "query_id": s["query_id"]})
         rec["balance_tags"] = sorted(classify_balance(rec))
         records.append(rec)
@@ -197,6 +217,8 @@ def main() -> None:
         a_status[r["status"]] = a_status.get(r["status"], 0) + 1
     lines += ["", "## Anchor verification", "", ", ".join(f"{k}: {v}" for k, v in sorted(a_status.items())),
               "", "Anchors marked `check` or `not_found` need a human look before the pilot is frozen.",
+              "", "Abstract sources for anchors: " + ", ".join(
+                  f"{k}: {v}" for k, v in sorted(_count(r['abstract_source'] or 'none' for r in records if r['block'] == 'A_anchor').items())),
               "", "## Query sizes", "", "| Query | Label | Total OpenAlex matches |", "|---|---|---|"]
     for p in pools_out:
         lines.append(f"| {p['query_id']} | {p['label']} | {p['total_matches']:,} |")
@@ -211,7 +233,7 @@ def main() -> None:
     (OUT / "run_receipt.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
 
     # ---- private, block-blind labeling sheet (shuffled, abstracts included, never committed) ----
-    sheet = [s for s in selected if s["block"] != "D_no_abstract"]
+    sheet = [s for s in selected if s["block"] != "D_no_abstract"]  # includes anchors even if no abstract was found
     random.Random(cfg["seed"] + 1).shuffle(sheet)
     with open(PRIVATE / "labeling_sheet.csv", "w", newline="", encoding="utf-8-sig") as f:
         wr = csv.writer(f)
@@ -220,7 +242,8 @@ def main() -> None:
             w = s["work"]
             venue = (((w.get("primary_location") or {}).get("source")) or {}).get("display_name")
             wr.writerow([i, w.get("id"), w.get("display_name"), w.get("publication_year"), venue,
-                         reconstruct_abstract(w.get("abstract_inverted_index")) or "(no abstract in OpenAlex)",
+                         reconstruct_abstract(w.get("abstract_inverted_index"))
+                         or (s.get("fallback") or (None, None))[0] or "(no abstract found)",
                          "", ""])
     print(json.dumps(receipt, indent=2))
 

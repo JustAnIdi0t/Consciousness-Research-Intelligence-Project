@@ -114,9 +114,12 @@ def title_similarity(a: str, b: str) -> float:
     return len(wa & wb) / len(wa | wb)
 
 
-def slim_record(work: dict) -> dict:
+def slim_record(work: dict, fallback_text: str | None = None, fallback_source: str | None = None) -> dict:
     """Public record: metadata only. Abstract text is included only under an open license."""
     text = reconstruct_abstract(work.get("abstract_inverted_index"))
+    source = "openalex" if text else None
+    if not usable_abstract(text) and fallback_text:
+        text, source = fallback_text, fallback_source
     lic = work_license(work)
     topic = work.get("primary_topic") or {}
     src = ((work.get("primary_location") or {}).get("source") or {})
@@ -141,7 +144,7 @@ def slim_record(work: dict) -> dict:
         "has_abstract": usable_abstract(text),
         "abstract_words": len(text.split()) if text else 0,
         "abstract_hash": abstract_hash(text),
-        "abstract_source": "openalex" if text else None,
+        "abstract_source": source,
         "abstract_open_text": text if (text and lic in OPEN_LICENSES) else None,
     }
     return rec

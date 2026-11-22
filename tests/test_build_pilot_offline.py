@@ -35,6 +35,7 @@ class FakeOA:
 
 def test_offline_build(tmp_path, monkeypatch):
     monkeypatch.setattr(build_pilot, "OpenAlex", FakeOA)
+    monkeypatch.setattr(build_pilot.fallback_abstracts, "find_abstract", lambda doi: ("pubmed text " * 30, "pubmed"))
     monkeypatch.setattr(build_pilot, "OUT", tmp_path / "pilot")
     monkeypatch.setattr(build_pilot, "PRIVATE", tmp_path / "private")
     build_pilot.main()
