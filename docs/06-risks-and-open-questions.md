@@ -6,7 +6,7 @@ Version 0.1 · November 2026
 
 | Risk | Why it matters | Mitigation |
 |---|---|---|
-| **Abstract copyright in a public repo** | Many publisher abstracts are copyrighted. Committing tens of thousands of them publicly may break terms, especially PubMed and publisher sources | Proposed abstract policy below |
+| **Abstract copyright in a public repo** | Many publisher abstracts are copyrighted. Committing tens of thousands of them publicly may break terms, especially PubMed and publisher sources | Abstract policy below |
 | **Keyword flood** | "Awareness", "attention", "consciousness" have many non-experiential meanings | Broad search, then rubric-based AI screening, with excluded papers audited |
 | **Philosophy under-covered** | PhilPapers restricts redistribution; many philosophy works lack abstracts in open databases | State coverage gaps openly; ask PhilPapers about permitted use; record `no_abstract` papers rather than dropping them |
 | **Mentions mistaken for evidence** | The biggest scientific integrity risk in any field map | Separate theory roles; "tests_prediction" needs a described test; no support/refute judgments without a separate, documented evaluation step |
@@ -17,9 +17,9 @@ Version 0.1 · November 2026
 | **Leaked API key in a public repo** | Anyone could spend the budget | Keys only in GitHub Secrets and a local `.env` that git ignores; enable GitHub secret scanning |
 | **Scope creep** | The outline has nine phases | Ship small: pilot, then one atlas slice (for example, global workspace theory and visual masking) before broadening |
 
-## Proposed abstract policy (needs owner decision)
+## Abstract policy (decided 2026-11-22)
 
-**Recommended:** publish everything except full publisher abstracts.
+**Decided by the owner:** publish everything except full publisher abstracts.
 
 - Publish in the repo: all metadata (OpenAlex is CC0), all AI codings, all human review decisions, and the short supporting quotes the coding relies on (a sentence or less each, with attribution and a link to the source).
 - Publish full abstracts only where the license allows it (for example CC BY open-access papers, or arXiv papers with a permissive license).
@@ -27,11 +27,11 @@ Version 0.1 · November 2026
 
 This keeps every step auditable without republishing copyrighted text in bulk.
 
-Alternatives: commit every abstract (most transparent, legally risky), or commit no abstract text at all, even quotes (safest, but harder to audit).
+Rejected alternatives: commit every abstract (most transparent, legally risky), or commit no abstract text at all, even quotes (safest, but harder to audit).
 
 ## Open questions for the owner
 
-1. Approve or change the abstract policy above.
+1. ~~Approve or change the abstract policy above.~~ Decided 2026-11-22.
 2. Review the rubric in doc 01 (checklist at the end).
 3. Would your RAND contact label 20 pilot papers? It would give a human-agreement baseline.
 4. Is there a theory or phenomenon you want as the first atlas slice?

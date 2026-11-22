@@ -37,4 +37,4 @@ CRIP is a public, source-grounded map of consciousness research. It collects pub
 
 - Code: MIT license.
 - Our own codings, rubric and documents: CC BY 4.0.
-- Third-party metadata keeps its source license (OpenAlex is CC0). Publisher abstracts are handled under the policy in [Risks and open questions](docs/06-risks-and-open-questions.md).
+- Third-party metadata keeps its source license (OpenAlex is CC0). Publisher abstracts are handled under the abstract policy in [Risks and open questions](docs/06-risks-and-open-questions.md).
