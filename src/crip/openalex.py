@@ -44,7 +44,9 @@ class OpenAlex:
             if r.status_code == 200:
                 return r.json()
             if r.status_code in (429, 500, 502, 503, 504):
-                time.sleep(2 ** attempt)
+                wait = int(r.headers.get("Retry-After", 0) or 0) or 2 ** attempt
+                print(f"  OpenAlex {r.status_code}, retrying in {wait}s: {r.text[:200]!r}", flush=True)
+                time.sleep(min(wait, 60))
                 continue
             raise RuntimeError(f"OpenAlex {r.status_code} for {r.url}: {r.text[:300]}")
         raise RuntimeError(f"OpenAlex kept failing for {path} {params}")
