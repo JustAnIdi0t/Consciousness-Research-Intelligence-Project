@@ -1,0 +1,7 @@
+# Secrets: never commit API keys
+.env
+*.env
+# Local working files
+__pycache__/
+.venv/
+*.sqlite-journal
