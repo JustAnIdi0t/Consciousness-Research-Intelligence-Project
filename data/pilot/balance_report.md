@@ -1,6 +1,6 @@
 # Pilot balance report
 
-Generated 2026-11-22T20:20:52+00:00 from `config/pilot_queries.yaml` v0.1 (seed 20261122).
+Generated 2026-11-22T20:23:16+00:00 from `config/pilot_queries.yaml` v0.1 (seed 20261122).
 
 Tags come from OpenAlex metadata (primary topic field and work type). They are rough proxies, not our coding.
 
@@ -24,6 +24,8 @@ Tags come from OpenAlex metadata (primary topic field and work type). They are r
 verified: 20
 
 Anchors marked `check` or `not_found` need a human look before the pilot is frozen.
+
+Abstract sources for anchors: none: 2, openalex: 11, pubmed: 7
 
 ## Query sizes
 
