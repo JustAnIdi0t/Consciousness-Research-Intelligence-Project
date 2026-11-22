@@ -1,0 +1,47 @@
+# Runs the free OpenAlex harvest for the pilot on GitHub's servers.
+# Triggered by pushes that change the pilot config or code on pilot/* branches, or by hand.
+name: Pilot harvest (OpenAlex, free)
+
+on:
+  push:
+    branches: ["pilot/**"]
+    paths: ["config/pilot_queries.yaml", "scripts/build_pilot.py", "src/**", ".github/workflows/pilot-harvest.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pilot-harvest-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Unit tests
+        run: python -m pytest -q tests
+      - name: Build pilot candidate list
+        env:
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+        run: python scripts/build_pilot.py
+      - name: Commit public outputs
+        run: |
+          git config user.name "crip-bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/pilot
+          if git diff --cached --quiet; then echo "No changes"; exit 0; fi
+          git commit -m "Pilot harvest: update candidate list [automated]"
+          git push
+      - name: Keep the private labeling sheet as a short-lived artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: private-labeling-sheet
+          path: private/labeling_sheet.csv
+          retention-days: 7

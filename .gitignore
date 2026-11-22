@@ -5,3 +5,5 @@
 __pycache__/
 .venv/
 *.sqlite-journal
+# Local-only outputs that may contain copyrighted abstract text (see docs/06 abstract policy)
+private/
